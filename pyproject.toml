@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "utfpr-icsi30-trabalho"
+version = "0.0.1"
+description = "Este projeto contempla o trabalho único da disciplina Sistemas Inteligentes"
+authors = ["Gabriela Taquegami <taquegami@alunos.utfpr.edu.br>; Thiago Toyomoto <thiagotoyomoto@alunos.utfpr.edu.br>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pygame = "^2.6.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
