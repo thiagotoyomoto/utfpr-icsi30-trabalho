@@ -1,15 +1,10 @@
-from collections import deque
-from vs.constants import VS
-from core.map import Map
 from math import sqrt
 
+from vs.constants import VS
+from core.map import Map
 from algorithms.queue.priority_queue import PriorityQueue
 from algorithms.queue.priotirized_item import PrioritizedItem
-import heapq
-
-type Position = tuple[int, int]
-type Action = tuple[int, int]
-type PositionList = list[Position]
+from utils.types import Position, PositionList, Action
 
 class aStar():
     def __init__ (self, map: Map, cost_line = 1.0, cost_diag = 1.5):
