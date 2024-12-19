@@ -10,8 +10,7 @@ from vs.environment import Env
 from core.map import Map
 from algorithms.stack import Stack
 from utils.types import Position
-
-from typing import TypedDict
+import random
 
 def subtract_position(a: Position, b: Position) -> Position:
     return (a[0] - b[0], a[1] - b[1])
@@ -73,14 +72,15 @@ class Explorer(AbstAgent):
 
         if self.last_dir_incr != None:
             self.unbacktracked[curr_pos].push(self.last_dir_incr)
+            
+        filtered_untried = list(filter(lambda item: item[1], enumerate(self.untried[curr_pos])))
+        if filtered_untried:
+            direction = random.choice(filtered_untried)[0]
+            self.untried[curr_pos][direction] = False
 
-        for direction in self.directions:
-            if self.untried[curr_pos][direction]:
-                self.untried[curr_pos][direction] = False
-
-                self.last_dir_incr = Explorer.AC_INCR[direction]
-                
-                return Explorer.AC_INCR[direction]
+            self.last_dir_incr = Explorer.AC_INCR[direction]
+            
+            return Explorer.AC_INCR[direction]
 
         self.last_dir_incr = None
         return invert_position(self.unbacktracked[curr_pos].pop())
