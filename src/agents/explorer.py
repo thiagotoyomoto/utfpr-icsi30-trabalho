@@ -6,30 +6,27 @@
 
 from vs.abstract_agent import AbstAgent
 from vs.constants import VS
+from vs.environment import Env
 from core.map import Map
+from algorithms.stack import Stack
+from utils.types import Position
+import random
 
+def subtract_position(a: Position, b: Position) -> Position:
+    return (a[0] - b[0], a[1] - b[1])
 
-class Stack:
-    def __init__(self):
-        self.items = []
+def add_position(a: Position, b: Position) -> Position:
+    return (a[0] + b[0], a[1] + b[1])
 
-    def push(self, item):
-        self.items.append(item)
-
-    def pop(self):
-        if not self.is_empty():
-            return self.items.pop()
-
-    def is_empty(self):
-        return len(self.items) == 0
-
+def invert_position(a: Position) -> Position:
+    return (-a[0], -a[1])
 
 class Explorer(AbstAgent):
     """class attribute"""
 
     MAX_DIFFICULTY = 1  # the maximum degree of difficulty to enter into a cell
 
-    def __init__(self, env, config_file, resc, dirs):
+    def __init__(self, env: Env, config_file: str, resc, dirs: list[int]):
         """Construtor do agente random on-line
         @param env: a reference to the environment
         @param config_file: the absolute path to the explorer's config file
@@ -52,34 +49,41 @@ class Explorer(AbstAgent):
         # put the current position - the base - in the map
         self.map.add((self.x, self.y), 1, VS.NO_VICTIM, self.check_walls_and_lim())
 
-        self.cells = {}
         self.directions = dirs
+
+        self.untried: dict[Position, list[bool]] = {}
+        self.unbacktracked: dict[Position, Stack[Position]] = {}
+        
+        self.last_dir_incr: Position = None
 
     def get_next_position(self):
         neighbourhood = self.check_walls_and_lim()
         curr_pos = (self.x, self.y)
 
-        if curr_pos not in self.cells:
-            self.cells[curr_pos] = [1] * 8
+        if curr_pos not in self.untried:
+            self.untried[curr_pos] = [True] * 8
 
-            for i in range(8):
-                direction = self.directions[i]
-
+            for direction in self.directions:
                 if neighbourhood[direction] != VS.CLEAR:
-                    self.cells[curr_pos][direction] = -1
+                    self.untried[curr_pos][direction] = False
+        
+        if curr_pos not in self.unbacktracked:
+            self.unbacktracked[curr_pos] = Stack()
 
-        for i in range(8):
-            direction = self.directions[i]
+        if self.last_dir_incr != None:
+            self.unbacktracked[curr_pos].push(self.last_dir_incr)
+            
+        filtered_untried = list(filter(lambda item: item[1], enumerate(self.untried[curr_pos])))
+        if filtered_untried:
+            direction = random.choice(filtered_untried)[0]
+            self.untried[curr_pos][direction] = False
 
-            if neighbourhood[direction] == VS.CLEAR and self.cells[curr_pos][direction] == 1:
-                self.cells[curr_pos][direction] = 0
-                return Explorer.AC_INCR[direction]
-    
-        for i in range(8):
-            direction = self.directions[i]
+            self.last_dir_incr = Explorer.AC_INCR[direction]
+            
+            return Explorer.AC_INCR[direction]
 
-            if neighbourhood[direction] == VS.CLEAR and self.cells[curr_pos][direction] == 0:
-                return Explorer.AC_INCR[direction]
+        self.last_dir_incr = None
+        return invert_position(self.unbacktracked[curr_pos].pop())
 
     def explore(self):
         # get an random increment for x and y
@@ -135,6 +139,8 @@ class Explorer(AbstAgent):
         return
 
     def come_back(self):
+        print("Calling come_back")
+
         dx, dy = self.walk_stack.pop()
         dx = dx * -1
         dy = dy * -1

@@ -54,3 +54,5 @@ class VS:
     DIR_SOUTHWEST = 5
     DIR_WEST = 6
     DIR_NORTHWEST = 7
+
+    OPPOSITE_DIR = [4, 5, 6, 7, 0, 1, 2, 3]
