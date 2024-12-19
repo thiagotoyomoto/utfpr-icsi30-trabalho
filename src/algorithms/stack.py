@@ -1,7 +1,7 @@
 class Stack[T]:
     def __init__(self, items: list[T] = None):
         self._items = items if items is not None else []
-        self._length = 0
+        self._length = len(self._items)
 
     def push(self, item: T):
         self._items.append(item)
