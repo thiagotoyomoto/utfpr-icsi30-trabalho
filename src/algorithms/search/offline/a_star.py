@@ -94,4 +94,4 @@ class aStar():
                         return new_plan, new_acc_cost
 
                     heuristic = self.euclidean_distance(neighbour, goal)
-                    self.open.push(PrioritizedItem(heuristic, (neighbour, new_plan, new_acc_cost)))
+                    self.open.push(PrioritizedItem(new_acc_cost + heuristic, (neighbour, new_plan, new_acc_cost)))
